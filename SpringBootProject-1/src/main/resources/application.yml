@@ -1,0 +1,16 @@
+server:
+  port: 8088
+  
+security:
+  oauth2:
+    client:
+      clientId: 011140b20b5c6bcfd076
+      clientSecret: dcc84733e898561b34144860d1f22e2474001602
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      user-info-uri: https://api.github.com/user
+      prefer-token-info: false 
+#/github.com == settings==Developer Settings== OAuth App== create or register App
+  
