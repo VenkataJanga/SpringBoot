@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+<script th:inline="javascript">
+window.onload = function() { 
+    var dataEthnicity = /*[[${dataEthnicity}]]*/ ; 
+    var dataEthnicityJson=JSON.parse(dataEthnicity);
+ 
+    var dataMale = /*[[${dataMale}]]*/ ; 
+    var dataMaleJson=JSON.parse(dataMale);
+ 
+    var dataFemale = /*[[${dataFemale}]]*/ ; 
+    var dataFemaleJson=JSON.parse(dataFemale);
+
+	 var chart = new CanvasJS.Chart("chartContainer", {
+			theme: "light2", // "light1", "dark1", "dark2"
+			exportEnabled: true,
+			animationEnabled: true,
+			title: {
+				text: "Ethnicity Distribution"
+			},
+			data: [{
+				type: "pie",
+				toolTipContent: "<b>{label}</b>: {y}%",
+				indexLabelFontSize: 16,
+				indexLabel: "{label} - {y}%",
+				dataPoints:dataEthnicityJson
+			}]
+		});
+
+		chart.render();
+
+		
+		
+		var chart = new CanvasJS.Chart("chartContainer2", {
+			animationEnabled: true,
+			title:{
+				text: "Age Distribution"
+			},	
+			axisY: {
+				title: "Percent of total population",
+				titleFontColor: "#4F81BC",
+				lineColor: "#4F81BC",
+				labelFontColor: "#4F81BC",
+				tickColor: "#4F81BC"
+			},
+			axisY2: {
+				title: "Percent of total population",
+				titleFontColor: "#C0504E",
+				lineColor: "#C0504E",
+				labelFontColor: "#C0504E",
+				tickColor: "#C0504E"
+			},	
+			toolTip: {
+				shared: true
+			},
+			legend: {
+				cursor:"pointer",
+				itemclick: toggleDataSeries
+			},
+			data: [{
+				type: "column",
+				name: "Male",
+				legendText: "Male",
+				showInLegend: true, 
+				dataPoints:dataMaleJson
+			},
+			{
+				type: "column",	
+				name: "Female",
+				legendText: "Female",
+				axisYType: "secondary",
+				showInLegend: true,
+				dataPoints:dataFemaleJson
+			}]
+		});
+		chart.render();
+
+		function toggleDataSeries(e) {
+			if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				e.dataSeries.visible = false;
+			}
+			else {
+				e.dataSeries.visible = true;
+			}
+			chart.render();
+		}
+
+		 
+}
+</script>
+
+<title>Search Patients</title>
+</head>
+<body>
+	<header th:insert="header.html :: header"> </header>
+	<div align="center" class="jumbotron vertical-center mx-5 my-5">
+		<h2>Search Patients</h2>
+		<div class="container">
+
+			<form method="post" th:action="@{/submitSearch}"
+				th:object="${searchparam}"
+				class="jumbotron vertical-center mx-5 my-5">
+
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label font-weight-bold">Gender</label>
+					<div class="col-sm-8">
+						<!-- 						<input type="text" class="form-control" th:field="*{gender}" -->
+						<!-- 							required> -->
+						<select id="searchBy" name="searchBy" th:field="*{gender}"
+							class="form-control">
+							<option value="Male">Male</option>
+							<option value="Female">Female</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label font-weight-bold">Start
+						Age</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" th:field="*{startAge}"
+							required>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label font-weight-bold">End
+						Age</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" th:field="*{endAge}"
+							required>
+					</div>
+				</div>
+				<div align="center">
+					<button type="submit" class="btn btn-dark">Submit</button>
+				</div>
+			</form>
+			<!-- from here list -->
+			<div th:switch="${patientlist}">
+				<h2 th:case="null">No patients found</h2>
+				<div th:case="*">
+					<h2>Patients</h2>
+					<table>
+						<thead>
+							<tr>
+								<th>FullName</th>
+								<th>LastName</th>
+								<th>Age</th>
+								<th>Gender</th>
+								<th>ethnicity</th>								
+								
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="patient : ${patientlist}">
+								<td th:text="${patient.fullName}"></td>
+								<td th:text="${patient.lastName}"></td>
+								<td th:text="${patient.age}"></td>
+								<td th:text="${patient.gender}"></td>
+								<td th:text="${patient.ethnicity}"></td>
+
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+			</div>
+			<!-- patient list end here -->
+			<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+ 
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+
+		</div>
+
+	</div>
+</body>
+</html>
