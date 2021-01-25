@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+	<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+ <link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ 
+
+<!-- <link rel="stylesheet" -->
+<!-- 	th:href="@{assets/bootstrap/icon.css}" > -->
+<!--
+<link rel="stylesheet"
+		th:href="@{assets/map/css/leaflet.css}"  
+	integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+	crossorigin="" />
+	
+<link rel="stylesheet"
+		th:href="@{assets/map/css/MarkerCluster.css}" />
+<link rel="stylesheet"
+		th:href="@{assets/map/css/MarkerCluster.Default.css}"/>
+
+<script  th:src="@{assets/map/leaflet.js}"
+	integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+	crossorigin=""></script>
+	
+<script  th:src="@{assets/map/leaflet.markercluster.js}" ></script>
+-->
+
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+	integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+	crossorigin="" />
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
+<link rel="stylesheet"
+	href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
+
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+	integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+	crossorigin=""></script>
+<script
+	src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
+
+
+
+
+<script type="text/javascript"
+	 th:src="@{assets/export/html2canvas.min.js}" >
+</script>
+
+<script type="text/javascript"
+  th:src="@{assets/export/jspdf.min.js}">
+</script>
+
+ 
+<script th:src="@{assets/d3/d3.v3.min.js}"></script>
+<script th:src="@{assets/d3/topojson.v1.min.js}"></script>
+<script th:src="@{assets/d3/datamaps.usa.min.js}"></script>
+
+<script  th:src="@{assets/chart/core.js}"></script>
+<script  th:src="@{assets/chart/charts.js}"></script>
+<script  th:src="@{assets/chart/animated.js}"></script>
+
+
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+<!--
+<link th:rel="stylesheet"
+	th:href="@{assets/bootstrap/bootstrap.min.css}"  
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+	
+ <link rel="stylesheet"th:rel="stylesheet"  
+ 	th:href="@{assets/bootstrap/icon.css}"> -->
+	
+	
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+
+	
+	 <link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	
+<link th:rel="stylesheet"
+	th:href="@{assets/bootstrap-slider/css/bootstrap-slider.css}" />
+<link th:rel="stylesheet"
+	th:href="@{webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} " />
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+
+<title>Search Patients</title>
+</head>
+<body>
+	<header th:insert="header.html :: header"> </header>
+
+	<div class="row">
+		<div align="center" class="col-5">
+			<h2 class="font-18 font-center">Search Patients</h2>
+			<div class="container">
+
+				<form id="frmSchPatient"  
+					th:object="${searchparam}"
+					class="jumbotron vertical-center mx-5 my-5" action="" method="post">
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label font-weight-bold">Gender</label>
+						<div class="col-sm-1"></div>
+						<div class="col-sm-6">
+							<select id="searchBy" name="searchBy" th:field="*{gender}"
+								class="form-control">
+								<option value="">All</option>
+								<option value="Male">Male</option>
+								<option value="Female">Female</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<div class="col-12 d-flex justify-content-between">
+							<label class="col-form-label font-weight-bold">Age</label> <label
+								class="col-form-label font-weight-bold">(Between 0 -
+								130)</label>
+						</div>
+						<div class="col-sm-12">
+							<input id="ageRange" type="text" class="span2" value=""
+								data-slider-min="1" data-slider-max="130" data-slider-step="2"
+								data-slider-value="[0,130]" data-slider-tooltip="show" /> <input
+								type="hidden" id="rangeMin" th:field="*{startAge}" /> <input
+								type="hidden" id="rangeMax" th:field="*{endAge}" />
+						</div>
+					</div> 
+					<div class="form-group row">
+						<div class="col-12 d-flex justify-content-between">
+							<label class="col-form-label font-weight-bold">Racial Group</label> 
+						</div>
+						<div class="col-sm-12">
+						  <input type="checkbox"  name="ethnicGroups"
+					            th:each="race : ${allRaceGroups}"
+					            th:text="${race.name}"
+					            th:value="${race.id}" /> 
+						</div>
+					</div> 
+					<div class="form-group row">
+						<div class="col-12 d-flex justify-content-between">
+							<label class="col-form-label font-weight-bold">Click each state to include</label> 
+						</div>
+						<div class="col-sm-12">
+						  <div id="mapfilter" style="position: relative;"></div>
+						  <input type="hidden" id="selectedStates" th:field="*{selectedStates}" />
+ 
+						 <p style="float: left; font-weight: bold;">Selected States:</p>
+ 						 <label id="lblselectedStates" th:text="*{selectedStates}"  style="float: left"></label>
+						 
+						</div>
+					</div> 
+					
+					<div align="center">	
+						<button id="btnsubmit"class="btn btn-dark" type="button">View</button>
+					</div>
+				</form>
+				
+			</div>
+		</div>
+		<div class="col-7">
+			<div id="chartresultdiv" style="display:none;">
+					<div id="containerCharts" >
+
+						<h2 class="font-18 font-center">Cohort Crafter(Search
+							Patients) </h2>
+
+						<div class="row">
+							<div class="col-6 nopadding">
+
+
+								<div>
+									<div id="title"
+										style="font-family: Calibri, Optima, Candara, Verdana, Geneva, sans-serif; font-size: 30px;">
+										Age Distribution</div>
+									<div id="chartContainer2"
+										style="height: 500px; width: 100%; border: 1px solid #AAA;"></div>
+
+								</div>
+							</div>
+							<div class="col-6 nopadding">
+								<div>
+									<div id="title"
+										style="font-family: Calibri, Optima, Candara, Verdana, Geneva, sans-serif; font-size: 30px;">
+										Ethnicity Distribution</div>
+									<div id="chartContainer"
+										style="height: 500px; width: 100%; border: 1px solid #AAA;"></div>
+
+								</div>
+
+							</div>
+						</div>
+						<br>
+						<div class="row">
+							<div class="col">
+								<div id="title"
+									style="font-family: Calibri, Optima, Candara, Verdana, Geneva, sans-serif; font-size: 30px;">
+									Location Distribution</div>
+
+								<div id="map"
+									style="height: 500px; width: 100%; border: 1px solid #AAA;"></div>
+							</div>
+						</div>
+					</div>
+					<br>
+
+					<div class="row">
+						<div class="col text-right">
+							<button id="download">Download as PDF</button>
+
+						</div>
+					</div>
+
+			</div>
+		</div>
+ 
+	
+	
+<div id="myModal" class="modal fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Validation Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		    </div>
+        </div>
+    </div>
+</div>	
+	 
+	
+	<div id="loading" style="display:none">
+		<img id="loading-image" th:src="@{/images/ajax-loader.gif}"  alt="Loading..." />
+		
+	</div>
+</div>
+
+	<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script th:rel="stylesheet"
+		th:src="@{assets/bootstrap-slider/bootstrap-slider.js}"></script>
+		
+</body>
+</html>
+<script>L_PREFER_CANVAS = true</script>
+<!-- <script th:src='@{assets/map/leaflet-image.js}'></script> -->
+
+<script src='https://unpkg.com/leaflet-image@0.4.0/leaflet-image.js'></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+	
+	var map=null;
+	var markers =null;
+			$("#ageRange").slider({});
+			$("#ageRange").on("slideStop", function(stopEvent) {
+				var range = stopEvent.value;
+				$("#rangeMin").val(range[0]);
+				$("#rangeMax").val(range[1]);
+			  
+			});
+    $(function () {
+
+    	var rangeVal = /*[[${rangeVal}]]*/ ; 
+   	    console.log("ageRange"+rangeVal);
+        $("#ageRange").slider('setValue', rangeVal, true);
+
+		$('input:checkbox[name=ethnicGroups][value=ASIAN]').attr('checked',true);
+	 
+		console.log("onload complete");
+
+    });
+	
+    
+	$("#btnsubmit").click(function(){
+		var responseValidation= ValidationEvent();
+		 if(responseValidation){
+
+				  var search = {}
+				  search["gender"] = $("#searchBy").val();
+				  search["startAge"] =   $("#rangeMin").val();
+				  search["endAge"] = $("#rangeMax").val();
+				  search["selectedStates"] = $("#selectedStates").val();
+				  
+				  var checkRace = [];
+				  $("input[name='ethnicGroups']:checked").each(function(i){
+					  checkRace[i] =$(this).val();
+				     });
+
+				 search["ethnicGroups"] =checkRace;
+
+				  
+				 console.log( JSON.stringify(search));
+				  var url = window.location;
+
+				    $.ajax({
+				      url : url + "searchPatients",
+				      type: 'post',
+				      data: JSON.stringify(search),
+				      contentType: "application/json",
+				      beforeSend: function() {
+		 		          $('#loading').modal('show'); 
+				      },
+				      success: function(response) {
+		 		          $('#loading').modal('hide'); 
+
+					  if(response.patientPresentFlag){
+				            $("#chartresultdiv").show();
+
+				 			drawAgeDistributionChart(response.dataAgeMale,response.dataAgeFemale);   
+					        
+					        drawEthnicityDistributionChart(response.dataEthnicity);
+
+					        drawLocationDistributionChart(response.locationStatsList);
+
+					  }else{
+
+				            $("#chartresultdiv").hide();
+				            $('.modal-body').html("No records found with input search filter. Kindly change the filter and try again");
+				        	$('#myModal').modal('show'); 
+				        	
+					  }
+				          					    
+				      },
+				      error: function(xhr) { // if error occured
+				          $('#loading').modal('hide'); 
+
+				      },
+				      complete: function() {
+				          $('#loading').modal('hide'); 
+				      }
+
+				  });
+
+		 }
+	
+	});
+
+	
+    function drawLocationDistributionChart(data){
+	 
+		 if (!map) {
+		    this.map = new L.map("map", { attributionControl:false });
+		    map.setView([37.0902, -95.06455], 4);
+		}
+		console.log("list: "+ data.length);
+		
+		
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+		  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		}).addTo(map);
+		
+		 if (markers) {
+			 map.removeLayer(markers)
+		 }
+		 markers = L.markerClusterGroup();
+		
+	    for(var i=0; i< data.length;i++) {
+	        if(data[i].latitude !== null && data[i].longitude !== "") {
+	              var title=  "<b>FullName:</b> "+data[i].fullName+'<br>'+
+	              "<b>Address:</b> "+data[i].homeAddressLine1+'<br>'+
+	              "<b>Age:</b> "+data[i].age+'<br>'+
+	              "<b>Gender:</b> "+data[i].gender+'<br>' ;
+
+	              var marker = L.marker(new L.LatLng(data[i].latitude, data[i].longitude), {
+	            	    title: title
+	              });
+	              
+				  marker.bindPopup(title);
+				  markers.addLayer(marker);
+	        }
+	    }
+		map.addLayer(markers);
+
+    }
+    
+    function drawEthnicityDistributionChart( dataEthnicity){
+        var dataEthnicityJson=JSON.parse(dataEthnicity);
+        am4core.ready(function() {  
+        	 // Themes begin
+        	 am4core.options.autoDispose = true;
+
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("chartContainer", am4charts.PieChart);
+            chart.legend = new am4charts.Legend();
+             
+
+            chart.legend.valueLabels.template.disabled = true;
+            chart.legend.fontSize = 11;
+            chart.legend.maxHeight = 150;
+            chart.legend.scrollable = true;
+            chart.legend.maxWidth = undefined;
+
+            //chart.legend.labels.template.maxWidth = 500;
+            chart.legend.labels.template.truncate = true;
+            //chart.legend.position = "right";
+            chart.legend.itemContainers.template.paddingTop = 2;
+            chart.legend.itemContainers.template.paddingBottom = 2;
+
+            chart.legend.marginLeft = 0;
+            chart.legend.marginRight = 0;
+
+            chart.legend.valueLabels.template.align     = "left";
+            chart.legend.valueLabels.template.textAlign = "end";
+            chart.legend.markers.template.width   = 20;
+            chart.legend.markers.template.height  = 20;
+			chart.legend.itemContainers.template.tooltipText = "{category}";
+			chart.legend.labels.template.wrap = true;
+
+            // Add data
+            chart.data=dataEthnicityJson;
+
+            // Add and configure Series
+            var pieSeries = chart.series.push(new am4charts.PieSeries());
+            pieSeries.dataFields.value = "y";
+            pieSeries.dataFields.category = "name";
+            pieSeries.slices.template.stroke = am4core.color("#fff");
+            pieSeries.slices.template.strokeOpacity = 1;
+
+            // This creates initial animation
+            pieSeries.hiddenState.properties.opacity = 1;
+            pieSeries.hiddenState.properties.endAngle = -90;
+            pieSeries.hiddenState.properties.startAngle = -90;
+
+            chart.hiddenState.properties.radius = am4core.percent(0);
+
+            pieSeries.labels.template.text = "";
+
+    	 }); // end am4core.ready()
+
+    }
+    
+    function drawAgeDistributionChart( dataMale, dataFemale) {
+
+        
+        var dataMaleJson= JSON.parse(JSON.stringify(dataMale));
+        console.log('dataMaleJson'+JSON.stringify(dataMale));
+        
+        var dataFemaleJson= JSON.parse(JSON.stringify(dataFemale));
+        console.log('dataFemaleJson'+JSON.stringify(dataFemale));
+        
+        am4core.ready(function() {
+        	am4core.options.autoDispose = true;
+
+        	// Themes begin
+        	am4core.useTheme(am4themes_animated);
+        	// Themes end
+
+        	var mainContainer = am4core.create("chartContainer2", am4core.Container);
+        	mainContainer.width = am4core.percent(100);
+        	mainContainer.height = am4core.percent(100);
+        	mainContainer.layout = "horizontal";
+
+        	if(dataMaleJson!=null){
+        		var maleChart = mainContainer.createChild(am4charts.XYChart);
+            	maleChart.legend = new am4charts.Legend();
+            	maleChart.legend.labels.template.text = "[bold {color}] Male";
+
+            	maleChart.paddingRight = 0;
+            	maleChart.data = dataMaleJson;
+
+            	// Create axes
+            	var maleCategoryAxis = maleChart.yAxes.push(new am4charts.CategoryAxis());
+            	maleCategoryAxis.dataFields.category = "ageCategory";
+            	maleCategoryAxis.renderer.minGridDistance = 5;
+
+            	var maleValueAxis = maleChart.xAxes.push(new am4charts.ValueAxis());
+            	maleValueAxis.renderer.inversed = true;
+
+            	maleValueAxis.numberFormatter = new am4core.NumberFormatter();
+            	maleValueAxis.numberFormatter.numberFormat = "#.#'%'";
+
+            	// Create series
+            	var maleSeries = maleChart.series.push(new am4charts.ColumnSeries());
+            	maleSeries.dataFields.valueX = "genderVal";
+            	maleSeries.dataFields.valueXShow = "percent";
+            	maleSeries.calculatePercent = true;
+            	maleSeries.dataFields.categoryY = "ageCategory";
+            	maleSeries.interpolationDuration = 1000; 
+            	maleSeries.columns.template.tooltipText = "Male, Age {categoryY} \n Population: {valueX.percent.formatNumber('#.0')}%"; 
+
+            	maleSeries.sequencedInterpolation = true;
+
+        	}
+        	
+        	if(dataFemaleJson!=null){
+        		var femaleChart = mainContainer.createChild(am4charts.XYChart);
+            	femaleChart.legend = new am4charts.Legend();
+            	femaleChart.legend.labels.template.text = "[bold {color}] Female";
+            	 
+            	femaleChart.paddingLeft = 0;
+            	femaleChart.data = dataFemaleJson;
+
+            	// Create axes
+            	var femaleCategoryAxis = femaleChart.yAxes.push(new am4charts.CategoryAxis());
+            	femaleCategoryAxis.renderer.opposite = true;
+            	femaleCategoryAxis.dataFields.category = "ageCategory";
+            	femaleCategoryAxis.renderer.minGridDistance = 5;
+
+            	var femaleValueAxis = femaleChart.xAxes.push(new am4charts.ValueAxis());
+
+            	femaleValueAxis.numberFormatter = new am4core.NumberFormatter();
+            	femaleValueAxis.numberFormatter.numberFormat = "#.#'%'";
+            	femaleValueAxis.renderer.minLabelPosition = 0.01;
+
+            	// Create series
+            	var femaleSeries = femaleChart.series.push(new am4charts.ColumnSeries());
+            	femaleSeries.dataFields.valueX = "genderVal";
+            	femaleSeries.dataFields.valueXShow = "percent";
+            	femaleSeries.calculatePercent = true;
+
+            	femaleSeries.sequencedInterpolation = true;
+            	femaleSeries.columns.template.tooltipText = "Female, Age {categoryY} \n Population: {valueX.percent.formatNumber('#.0')}%"; 
+
+            	femaleSeries.dataFields.categoryY = "ageCategory";
+            	femaleSeries.interpolationDuration = 1000;
+
+            	femaleSeries.fill = femaleChart.colors.getIndex(3);
+        	}
+
+    }); // end am4core.ready()
+    }
+    /*]]>*/
+</script>      
+  	 
+
+<style type="text/css">
+#map {
+	height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.font-18 {
+	font-size: 18px !important;
+}
+
+.canvasjs-chart-canvas {
+	height: 350px !important;
+}
+
+.slider.slider-horizontal {
+	width: 100% !important;
+}
+
+.font-center {
+	text-align: center !important;
+}
+
+#loading {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	position: fixed;
+	display: block;
+	opacity: 0.7;
+	background-color: #fff;
+	z-index: 99;
+	text-align: center;
+}
+
+#loading-image {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 100;
+}
+
+/* #map { */
+/*   z-index: 95; */
+/* } */
+
+
+ 
+ul#selected_example{
+  padding-left: 0px;
+}
+ul#selected_example li{
+  display: inline;
+  padding-left: 5px;
+}
+ 
+ .nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+#chartContainer {
+  width: 100%;
+   height: 100%; 
+  
+}
+
+
+ #chartContainer2 {
+  width: 100%;
+   height: 100%; 
+  
+}
+</style>
+
+
+
+
+
+<script type="text/javascript">
+ 
+		$("#download").click(function(){
+			$('#loading').show();
+	  html2canvas(document.querySelector("#containerCharts"),{ height: 1800, width: window.innerWidth * 2, scale: 1 ,allowTaint: true, useCORS: true}).then(canvas => {  
+	    var dataURL = canvas.toDataURL();
+	    var pdf = new jsPDF();
+	    pdf.addImage(dataURL, 'JPEG', 20, 0, 510, 360); //addImage(image, format, x-coordinate, y-coordinate, width, height)
+	    pdf.save("SearchResultExport.pdf");
+	    $('#loading').hide();
+	  });
+	});
+		
+		
+		</script>
+
+
+ <script>
+    var selected=[]; 
+
+    var USdata = {
+        'AK': 'AK',
+        'AL': 'AL',
+        'AR': 'AR',
+        'AZ': 'AZ',
+        'CA': 'CA',
+        'CO': 'CO',
+        'CT': 'CT',
+        'DC': 'DC',
+        'DE': 'DE',
+        'FL': 'FL',
+        'GA': 'GA',
+        'HI': 'HI',
+        'IA': 'IA',
+        'ID': 'ID',
+        'IL': 'IL',
+        'IN': 'IN',
+        'KS': 'KS',
+        'KY': 'KY',
+        'LA': 'LA',
+        'MA': 'MA',
+        'MD': 'MD',
+        'ME': 'ME',
+        'MI': 'MI',
+        'MN': 'MN',
+        'MO': 'MO',
+        'MS': 'MS',
+        'MT': 'MT',
+        'NC': 'NC',
+        'ND': 'ND',
+        'NE': 'NE',
+        'NH': 'NH',
+        'NJ': 'NJ',
+        'NM': 'NM',
+        'NV': 'NV',
+        'NY': 'NY',
+        'OH': 'OH',
+        'OK': 'OK',
+        'OR': 'OR',
+        'PA': 'PA',
+        'RI': 'RI',
+        'SC': 'SC',
+        'SD': 'SD',
+        'TN': 'TN',
+        'TX': 'TX',
+        'UT': 'UT',
+        'VA': 'VA',
+        'VT': 'VT',
+        'WA': 'WA',
+        'WI': 'WI',
+        'WV': 'WV',
+        'WY': 'WY'
+		
+		};
+
+    var USmap = new Datamap({
+        element: document.getElementById("mapfilter"),
+        scope: 'usa', //currently supports 'usa' and 'world', however with custom map data you can specify your own
+        projection: 'mercator',//'equirectangular', //style of projection to be used. try "mercator"
+      	width:500,
+        height: 300, 
+        fills: {
+            defaultFill: '#88a4bc',
+			 HIGH: '#3b729f',
+        },
+        geographyConfig: {
+			highlightOnHover: false,
+            popupOnHover: true,
+
+            highlightBorderColor: '#bada55',
+            popupTemplate: function (geography, data) {
+                return '<div class="hoverinfo">' + geography.properties.name + '</div>';
+            },
+            highlightBorderWidth: 2
+        },
+		
+		 done: function(datamap) {
+        datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+			  
+		var statecode =geography.id;
+        var index=selected.indexOf(statecode);        
+		if (index > -1){ //deselect state
+            selected.splice(index, 1);   
+			  var obj = {};
+			  obj[statecode] = {fillKey: 'defaultFill'} ;
+			  datamap.updateChoropleth(obj); 
+        }else{
+			selected.push(statecode);
+			 
+			var obj = {};
+			obj[statecode] = {fillKey: 'HIGH'} ;
+			datamap.updateChoropleth(obj); 
+
+		}    
+		document.getElementById('lblselectedStates').innerHTML = selected;
+		$("#selectedStates").val(selected);
+
+        });
+    }
+    });
+    USmap.labels({'customLabelText': USdata});
+    
+    
+    
+    function ValidationEvent() {
+ 		var selectedStatesInput = document.getElementById("selectedStates").value;
+    	if (selectedStatesInput!=null && selectedStatesInput.length>0) {
+     	return true;
+    	} else { 
+     
+   	    $('.modal-body').html("Kindly select at least one state from the map");
+    	$('#myModal').modal('show'); 
+
+    	return false;
+    	}
+    	}
+    
+
+
+</script>
