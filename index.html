@@ -100,13 +100,15 @@
 	<header th:insert="header.html :: header"> </header>
 
 	<div class="row">
-		<div align="center" class="col-5">
+		<div   class="col-5">
 			<h2 class="font-18 font-center">Search Patients</h2>
 			<div class="container">
 
 				<form id="frmSchPatient"  
+					th:action="@{/submitSearch}"
 					th:object="${searchparam}"
-					class="jumbotron vertical-center mx-5 my-5" action="" method="post">
+					class="jumbotron vertical-center mx-5 my-5" method="post"
+					onsubmit="return ValidationEvent()">
 					<div class="form-group row">
 						<label class="col-sm-2 col-form-label font-weight-bold">Gender</label>
 						<div class="col-sm-1"></div>
@@ -131,18 +133,30 @@
 								data-slider-value="[0,130]" data-slider-tooltip="show" /> <input
 								type="hidden" id="rangeMin" th:field="*{startAge}" /> <input
 								type="hidden" id="rangeMax" th:field="*{endAge}" />
+								
 						</div>
 					</div> 
 					<div class="form-group row">
 						<div class="col-12 d-flex justify-content-between">
 							<label class="col-form-label font-weight-bold">Racial Group</label> 
 						</div>
-						<div class="col-sm-12">
-						  <input type="checkbox"  name="ethnicGroups"
-					            th:each="race : ${allRaceGroups}"
-					            th:text="${race.name}"
-					            th:value="${race.id}" /> 
 						</div>
+						
+					 
+					 <div class="form-group row">
+						
+						 <div class="col-12" >
+						 
+						  <div class="checkgroup">
+						   <div th:each="race : ${allRaceGroups}">
+							<span style="white-space: nowrap;"  >
+							<input type="checkbox"  name="ethnicGroups" th:value="${race.id}"  th:field="*{ethnicGroups}" />
+							<label th:for="${#ids.prev('ethnicGroups')}"   th:text="${race.name}"></label></span><br/>
+							</div>
+						</div>
+						
+						</div>
+						 
 					</div> 
 					<div class="form-group row">
 						<div class="col-12 d-flex justify-content-between">
@@ -159,7 +173,7 @@
 					</div> 
 					
 					<div align="center">	
-						<button id="btnsubmit"class="btn btn-dark" type="button">View</button>
+						<button id="btnsubmit"class="btn btn-dark" type="submit" name="action" value="search">View</button>
 					</div>
 				</form>
 				
@@ -213,7 +227,8 @@
 
 					<div class="row">
 						<div class="col text-right">
-							<button id="download">Download as PDF</button>
+							<button type="submit" class="btn btn-dark" form="frmSchPatient" name="action" value="order">Order Data</button>	
+ 							<button id="download" class="btn btn-dark" >Download as PDF</button>
 
 						</div>
 					</div>
@@ -242,7 +257,7 @@
 </div>	
 	 
 	
-	<div id="loading" style="display:none">
+	<div id="loading" >
 		<img id="loading-image" th:src="@{/images/ajax-loader.gif}"  alt="Loading..." />
 		
 	</div>
@@ -272,83 +287,59 @@
 			  
 			});
     $(function () {
+         $('#loading').modal('show'); 
 
     	var rangeVal = /*[[${rangeVal}]]*/ ; 
    	    console.log("ageRange"+rangeVal);
         $("#ageRange").slider('setValue', rangeVal, true);
 
-		$('input:checkbox[name=ethnicGroups][value=ASIAN]').attr('checked',true);
-	 
+		//-------------------
+		
+		  var dataEthnicity = /*[[${patientResponse.dataEthnicity}]]*/ ; 
+
+	       var dataMale = /*[[${patientResponse.dataAgeMale}]]*/ ; 
+
+	       var dataFemale = /*[[${patientResponse.dataAgeFemale}]]*/ ; 
+
+	       var patientPresentFlag=/*[[${patientResponse.patientPresentFlag}]]*/ ;
+
+	       var data=/*[[${patientResponse.locationStatsList}]]*/ ;
+
+		   	console.log("dataMale: "+ dataMale);
+		   	console.log("dataFemale: "+ dataFemale);
+		   	console.log("dataEthnicity: "+ dataEthnicity);
+		   	console.log("patientPresentFlag: "+ patientPresentFlag);
+
+			if(patientPresentFlag!=null && patientPresentFlag=="ONLOAD_EMPTY_LIST"){
+				console.log("First time onload");
+    		}else if(patientPresentFlag!=null && patientPresentFlag=="VALID"){
+	            $("#chartresultdiv").show();
+
+			   	console.log("drawAgeDistributionChart");
+
+	        	drawAgeDistributionChart(dataMale,dataFemale);
+	        	
+
+			   	console.log("drawEthnicityDistributionChart");
+	 	        drawEthnicityDistributionChart(dataEthnicity);
+				 
+			    console.log("drawLocationDistributionChart");
+	 		    drawLocationDistributionChart(data);
+				 
+			}else{
+	            $("#chartresultdiv").hide();
+	            $('.modal-body').html("No records found with input search filter. Kindly change the filter and try again");
+	        	$('#myModal').modal('show'); 
+			}
+
+		//-------------------
+		 $('#loading').modal('hide'); 
+
 		console.log("onload complete");
 
     });
 	
-    
-	$("#btnsubmit").click(function(){
-		var responseValidation= ValidationEvent();
-		 if(responseValidation){
-
-				  var search = {}
-				  search["gender"] = $("#searchBy").val();
-				  search["startAge"] =   $("#rangeMin").val();
-				  search["endAge"] = $("#rangeMax").val();
-				  search["selectedStates"] = $("#selectedStates").val();
-				  
-				  var checkRace = [];
-				  $("input[name='ethnicGroups']:checked").each(function(i){
-					  checkRace[i] =$(this).val();
-				     });
-
-				 search["ethnicGroups"] =checkRace;
-
-				  
-				 console.log( JSON.stringify(search));
-				  var url = window.location;
-
-				    $.ajax({
-				      url : url + "searchPatients",
-				      type: 'post',
-				      data: JSON.stringify(search),
-				      contentType: "application/json",
-				      beforeSend: function() {
-		 		          $('#loading').modal('show'); 
-				      },
-				      success: function(response) {
-		 		          $('#loading').modal('hide'); 
-
-					  if(response.patientPresentFlag){
-				            $("#chartresultdiv").show();
-
-				 			drawAgeDistributionChart(response.dataAgeMale,response.dataAgeFemale);   
-					        
-					        drawEthnicityDistributionChart(response.dataEthnicity);
-
-					        drawLocationDistributionChart(response.locationStatsList);
-
-					  }else{
-
-				            $("#chartresultdiv").hide();
-				            $('.modal-body').html("No records found with input search filter. Kindly change the filter and try again");
-				        	$('#myModal').modal('show'); 
-				        	
-					  }
-				          					    
-				      },
-				      error: function(xhr) { // if error occured
-				          $('#loading').modal('hide'); 
-
-				      },
-				      complete: function() {
-				          $('#loading').modal('hide'); 
-				      }
-
-				  });
-
-		 }
-	
-	});
-
-	
+ 	
     function drawLocationDistributionChart(data){
 	 
 		 if (!map) {
@@ -617,10 +608,15 @@ ul#selected_example li{
    height: 100%; 
   
 }
+
+
+ .checkgroup {
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
+}
+ 
 </style>
-
-
-
 
 
 <script type="text/javascript">
@@ -642,6 +638,12 @@ ul#selected_example li{
 
  <script>
     var selected=[]; 
+    
+    //----------update existing selection-------
+    if($("#selectedStates").val()!=null && $("#selectedStates").val()!=''){
+    	selected = $("#selectedStates").val().split(',');
+    }
+    //----------update existing selection-------
 
     var USdata = {
         'AK': 'AK',
@@ -744,7 +746,22 @@ ul#selected_example li{
     }
     });
     USmap.labels({'customLabelText': USdata});
-    
+ 
+    //----------update existing selection-------
+    if($("#selectedStates").val()!=null && $("#selectedStates").val()!=''){
+
+        var arrayStates = $("#selectedStates").val().split(',');
+        var selectedobj = {};
+
+        for (index = 0; index < arrayStates.length; index++) { 
+            console.log(arrayStates[index]); 
+            selectedobj[arrayStates[index]] = {fillKey: 'HIGH'} ;
+
+        } 
+    	  
+        USmap.updateChoropleth(selectedobj);
+    }
+    //----------update existing selection-------
     
     
     function ValidationEvent() {

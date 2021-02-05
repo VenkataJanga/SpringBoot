@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+	<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+
+<meta http-equiv="Content-Type" content="text/html" ; charset="UTF-8">
+ 
+	
+	<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+
+	
+	 <link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	 
+<link th:rel="stylesheet"
+	th:href="@{webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} " />
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+
+<title>Success</title>
+</head>
+<body>
+	<header th:insert="header.html :: header"> </header>
+
+	<div class="row">
+		<div align="center" class="col-12">
+			<h1 class="font-18">Success Page</h1>
+			<div class="container">
+				<form id="frmdataresult"   
+					 method="post"  
+					 style="border:1px solid black"
+					class="jumbotron vertical-center mx-5 my-5" >
+					  
+					  <div class="form-group row">
+						<div class="justify-content-between">
+							 	<label class="col-form-label font-weight-bold">Request submitted successfully</label> 
+						</div>
+					</div> 
+				 
+					 <div class="form-group row">
+						<div class=" col-sm-2 justify-content-between">
+							 	<label class="col-form-label font-weight-bold">Columns selected :</label> 
+						</div>
+
+						 <div class="col-sm-10">		
+						 	     <label th:each="datacolumn, iterStat : ${searchparam.dataColumns}" th:text="!${iterStat.last} ? ${datacolumn} + ',': ${datacolumn}"></label>
+						</div>
+					</div> 
+				
+				    </form>
+					<form id="frmhome"  
+				    th:action="@{/home}" action="" method="post">
+				      <button id="btsuccess" type="submit" class="btn btn-dark" name="action" value="back">home</button>
+					</form>
+			</div>
+		</div>
+	  
+	  
+</div>
+ 
+</body>
+</html>
+  
+
+<style type="text/css">
+ 
+/* Optional: Makes the sample page fill the window. */
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.font-18 {
+	font-size: 18px !important;
+}
+ 
+.font-center {
+	text-align: center !important;
+}
+ 
+ .nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+ 
+</style>
+
+ 
+  
